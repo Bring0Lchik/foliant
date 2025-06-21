@@ -1,0 +1,23 @@
+<div class="form-container">
+    <h1>Создание аккаунта</h1>
+    <form action="/register" method="POST">
+        <div class="form-group">
+            <label for="full_name">ФИО</label>
+            <input type="text" id="full_name" name="full_name" class="form-control" value="<%= locals.oldInput && oldInput.full_name ? oldInput.full_name : '' %>" required>
+            
+            <% if (locals.errors && errors.full_name) { %><div class="error"><%= errors.full_name.msg %></div><% } %>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control" value="<%= locals.oldInput && oldInput.email ? oldInput.email : '' %>" required>
+            <% if (locals.errors && errors.email) { %><div class="error"><%= errors.email.msg %></div><% } %>
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+            <small style="font-size: 0.8rem; color: #6c757d;">Мин. 12 симв., заглавные и строчные буквы, цифры, спецсимволы(/[!@#$%^&*(),.?":{}|<>]/)</small>
+            <% if (locals.errors && errors.password) { %><div class="error"><%= errors.password.msg %></div><% } %>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Зарегистрироваться</button>
+    </form>
+</div>

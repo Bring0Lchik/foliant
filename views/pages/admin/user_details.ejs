@@ -1,0 +1,111 @@
+<h1>Профиль пользователя: <%= profile.full_name %></h1>
+<a href="/admin/users" style="margin-bottom: 20px; display: inline-block;">← Назад к списку пользователей</a>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    <!-- Левая колонка: информация и действия -->
+    <div>
+        <h3>Основная информация</h3>
+        <ul class="book-specs">
+            <li><strong>ID:</strong> <span><%= profile.id %></span></li>
+            <li><strong>Email:</strong> <span><%= profile.email %></span></li>
+            <li><strong>Адрес доставки:</strong> <span><%= profile.delivery_address || 'Не указан' %></span></li>
+            <li><strong>Дата регистрации:</strong> <span><%= new Date(profile.created_at).toLocaleString('ru-RU') %></span></li>
+        </ul>
+
+        <h3>Действия с пользователем</h3>
+        <div style="display: flex; gap: 15px; margin-top: 10px;">
+            <form action="/admin/user/<%= profile.id %>/toggle-block" method="POST">
+                <button type="submit" class="btn <%= profile.is_blocked ? 'btn-success' : 'btn-danger' %>">
+                    <%= profile.is_blocked ? 'Разблокировать' : 'Заблокировать' %>
+                </button>
+            </form>
+            <button id="open-offer-modal" class="btn btn-primary">Сделать предложение</button>
+        </div>
+    </div>
+
+    <!-- Правая колонка: Управление ролью -->
+    <div>
+        <h3>Управление ролью</h3>
+        <div class="form-container" style="margin: 0; padding: 20px;">
+            <p>Текущая роль: <strong><%= profile.role_name %></strong></p>
+            
+            <form action="/admin/user/<%= profile.id %>/change-role" method="POST" onsubmit="return confirmAction(this);">
+                <% if(profile.role_id == 2) { %>
+                    <!-- Повышаем клиента до админа -->
+                    <input type="hidden" name="new_role_id" value="1">
+                    <button type="submit" class="btn btn-warning">Назначить администратором</button>
+                <% } else if (profile.role_id == 1) { %>
+                    <!-- Понижаем админа до клиента -->
+                    <input type="hidden" name="new_role_id" value="2">
+                    
+                    <% if (currentAdminId === superAdminId) { %>
+                        <!-- Я супер-админ, могу разжаловать и себя, и других -->
+                        <button type="submit" class="btn btn-danger">
+                            <%= currentAdminId === profile.id ? 'Разжаловать себя до клиента' : 'Разжаловать до клиента' %>
+                        </button>
+                    <% } else { %>
+                        <!-- Я обычный админ, не могу никого разжаловать -->
+                        <button type="submit" class="btn btn-danger" disabled>Разжаловать до клиента</button>
+                        <p style="margin-top: 10px;"><small>Только супер-администратор может понижать других администраторов.</small></p>
+                    <% } %>
+                <% } %>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для спец. предложения -->
+<div id="offer-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-offer-modal">×</span>
+        <h3>Персональное предложение для <%= profile.full_name %></h3>
+        <form action="/admin/user/<%= profile.id %>/add-offer" method="POST">
+            <div class="form-group">
+                <label for="book-search">Поиск книги</label>
+                <input type="text" id="book-search" class="form-control" placeholder="Начните вводить название...">
+            </div>
+            <div class="form-group">
+                <label for="book_id">Выберите книгу</label>
+                <select name="book_id" id="book_id_select" class="form-control" required size="5">
+                    <% books.forEach(book => { %>
+                        <option value="<%= book.id %>"><%= book.title %> (Текущая цена: <%= Number(book.price).toFixed(2) %>₽)</option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="offer_price">Специальная цена (₽)</label>
+                <input type="number" step="0.01" name="offer_price" id="offer_price" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="expires_at">Действует до (дата и время)</label>
+                <input type="datetime-local" name="expires_at" id="expires_at" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить предложение</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function confirmAction(form) {
+        const newRoleId = form.querySelector('input[name="new_role_id"]').value;
+        let message = "Вы уверены, что хотите изменить роль этого пользователя?";
+        if (newRoleId == 2) {
+            message = "ВНИМАНИЕ! Вы собираетесь понизить администратора до клиента. Вы уверены?";
+        }
+        return confirm(message);
+    }
+    
+    const offerModal = document.getElementById('offer-modal');
+    document.getElementById('open-offer-modal').onclick = () => offerModal.style.display = 'block';
+    document.getElementById('close-offer-modal').onclick = () => offerModal.style.display = 'none';
+    window.onclick = (e) => { if (e.target == offerModal) offerModal.style.display = 'none'; };
+
+    const bookSearchInput = document.getElementById('book-search');
+    const bookSelect = document.getElementById('book_id_select');
+    const allBookOptions = Array.from(bookSelect.options);
+    bookSearchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        bookSelect.innerHTML = '';
+        allBookOptions.filter(option => option.text.toLowerCase().includes(searchTerm)).forEach(option => bookSelect.add(option));
+    });
+</script>

@@ -1,0 +1,55 @@
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Уведомления</h1>
+        <% if(locals.notifications && notifications.length > 0) { %>
+            <form action="/notifications/mark-read" method="POST">
+                <button type="submit" class="btn btn-secondary btn-sm">Отметить все как прочитанные</button>
+            </form>
+        <% } %>
+    </div>
+
+    <!-- Персональные предложения -->
+    <% if(locals.specialOffers && specialOffers.length > 0) { %>
+        <h2>Персональные предложения</h2>
+        <% specialOffers.forEach(offer => { %>
+            <div class="special-offer-card <%= offer.is_expired ? 'is-read' : '' %>">
+                <h4>Предложение на книгу «<%= offer.book_title %>»</h4>
+                <div class="special-offer-price">
+                    <!-- ИСПРАВЛЕНО ЗДЕСЬ -->
+                    <span class="original-price"><%= Number(offer.original_price).toFixed(2) %> ₽</span>
+                    <span class="new-price"><%= Number(offer.offer_price).toFixed(2) %> ₽</span>
+                </div>
+                <p>Действует до: <strong><%= offer.expires_at_formatted %></strong></p>
+                <% if (!offer.is_expired) { %>
+                    <form action="/offer/<%= offer.id %>/accept" method="POST">
+                        <button class="btn btn-success btn-sm">Принять и добавить в корзину</button>
+                    </form>
+                <% } else { %>
+                    <p><em>Предложение истекло.</em></p>
+                <% } %>
+            </div>
+        <% }) %>
+    <% } %>
+
+    <!-- Обычные уведомления -->
+    <h2>История уведомлений</h2>
+    <div class="notification-list">
+        <% if(locals.notifications && notifications.length > 0) { %>
+            <% notifications.forEach(notification => { %>
+                <a href="<%= notification.link || '#' %>" class="notification-list-item <%= notification.is_read ? 'is-read' : '' %>">
+                    <div class="notification-icon <%= notification.type %>">
+                        <% if (notification.type === 'order_status') { %> <i class="fa-solid fa-truck-fast"></i> <% } %>
+                        <% if (notification.type === 'special_offer') { %> <i class="fa-solid fa-star"></i> <% } %>
+                        <% if (notification.type === 'system') { %> <i class="fa-solid fa-info-circle"></i> <% } %>
+                    </div>
+                    <div class="notification-message">
+                        <p><%= notification.message %></p>
+                        <span class="notification-time"><%= new Date(notification.created_at).toLocaleString('ru-RU') %></span>
+                    </div>
+                </a>
+            <% }) %>
+        <% } else { %>
+            <p>У вас пока нет уведомлений.</p>
+        <% } %>
+    </div>
+</div>

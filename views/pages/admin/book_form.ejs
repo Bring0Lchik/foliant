@@ -1,0 +1,155 @@
+<h1><%= title %></h1>
+
+<form action="<%= locals.book && book.id ? '/admin/books/edit/' + book.id : '/admin/books/add' %>" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="title">Название</label>
+        <input type="text" name="title" id="title" class="form-control" value="<%= locals.book ? book.title : '' %>" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="cover_image">Обложка книги</label>
+        <input type="file" name="cover_image" id="cover_image" class="form-control" accept="image/png, image/jpeg, image/webp">
+        <% if (locals.book && book.cover_image_path) { %>
+            <p style="margin-top: 10px;">Текущее изображение: <img src="<%= book.cover_image_path %>" alt="Обложка" width="100"></p>
+        <% } %>
+    </div>
+
+    <div class="form-group">
+        <label for="authors">Авторы (можно выбрать несколько, зажав Ctrl)</label>
+        <div style="display: flex; gap: 10px;">
+            <select name="authors" id="authors-select" class="form-control" multiple required style="height: 150px;">
+                <% authors.forEach(author => { %>
+                    <option value="<%= author.id %>" <%= bookAuthors.includes(author.id) ? 'selected' : '' %>><%= author.name %></option>
+                <% }) %>
+            </select>
+            <button type="button" class="btn btn-secondary" id="add-author-btn">+</button>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="description">Описание</label>
+        <textarea name="description" id="description" rows="5" class="form-control"><%= locals.book ? book.description : '' %></textarea>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+            <label for="price">Цена</label>
+            <input type="number" step="0.01" name="price" id="price" class="form-control" value="<%= locals.book ? book.price : '' %>" required min="0">
+        </div>
+        <div class="form-group">
+            <label for="stock_quantity">Количество на складе</label>
+            <input type="number" name="stock_quantity" id="stock_quantity" class="form-control" value="<%= locals.book ? book.stock_quantity : '0' %>" required min="0">
+        </div>
+        <div class="form-group">
+            <label for="isbn">ISBN</label>
+            <input type="text" name="isbn" id="isbn" class="form-control" value="<%= locals.book ? book.isbn : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="publication_year">Год публикации</label>
+            <input type="number" name="publication_year" id="publication_year" class="form-control" value="<%= locals.book ? book.publication_year : '' %>" min="0" step="1">
+        </div>
+        <div class="form-group">
+            <label for="pages">Кол-во страниц</label>
+            <input type="number" name="pages" id="pages" class="form-control" value="<%= locals.book ? book.pages : '' %>" min="0">
+        </div>
+        <div class="form-group">
+            <label for="cover_image_path_manual">Путь к обложке (вручную, если не загружаете файл)</label>
+            <input type="text" name="cover_image_path_manual" class="form-control" value="<%= locals.book ? book.cover_image_path : '' %>" placeholder="/images/placeholder.jpg">
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="publisher_id">Издательство</label>
+        <div style="display: flex; gap: 10px;">
+            <select name="publisher_id" id="publishers-select" class="form-control">
+                <option value="">Не выбрано</option>
+                <% publishers.forEach(publisher => { %>
+                    <option value="<%= publisher.id %>" <%= (locals.book && book.publisher_id == publisher.id) ? 'selected' : '' %>><%= publisher.name %></option>
+                <% }) %>
+            </select>
+            <button type="button" class="btn btn-secondary" id="add-publisher-btn">+</button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="categories">Категории (можно выбрать несколько, зажав Ctrl)</label>
+        <select name="categories" id="categories" class="form-control" multiple style="height: 150px;">
+             <% categories.forEach(category => { %>
+                <option value="<%= category.id %>" <%= bookCategories.includes(category.id) ? 'selected' : '' %>><%= category.name %></option>
+            <% }) %>
+        </select>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
+
+<!-- Модальное окно для добавления автора -->
+<div id="author-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="close-author-modal">×</span>
+    <h3>Добавить нового автора</h3>
+    <div class="form-group">
+      <label for="new-author-name">Имя автора</label>
+      <input type="text" id="new-author-name" class="form-control">
+    </div>
+    <button id="save-author-btn" class="btn btn-primary">Сохранить</button>
+  </div>
+</div>
+
+<!-- Модальное окно для добавления издательства -->
+<div id="publisher-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="close-publisher-modal">×</span>
+    <h3>Добавить новое издательство</h3>
+    <div class="form-group">
+      <label for="new-publisher-name">Название издательства</label>
+      <input type="text" id="new-publisher-name" class="form-control">
+    </div>
+    <button id="save-publisher-btn" class="btn btn-primary">Сохранить</button>
+  </div>
+</div>
+
+<script>
+    function setupModal(modalId, openBtnId, closeBtnId, saveBtnId, inputId, selectId, endpoint) {
+        const modal = document.getElementById(modalId);
+        const openBtn = document.getElementById(openBtnId);
+        const closeBtn = document.getElementById(closeBtnId);
+        const saveBtn = document.getElementById(saveBtnId);
+        const nameInput = document.getElementById(inputId);
+        const mainSelect = document.getElementById(selectId);
+
+        if(!openBtn || !modal) return;
+
+        openBtn.onclick = () => modal.style.display = "block";
+        closeBtn.onclick = () => modal.style.display = "none";
+        window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; };
+
+        saveBtn.onclick = async () => {
+            const name = nameInput.value;
+            if (!name) return alert('Имя не может быть пустым');
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                if (!response.ok) throw new Error('Ошибка сети');
+                
+                const newData = await response.json();
+                
+                const newOption = new Option(newData.name, newData.id, true, true);
+                mainSelect.add(newOption);
+                
+                nameInput.value = '';
+                modal.style.display = "none";
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Не удалось сохранить данные');
+            }
+        };
+    }
+
+    setupModal('author-modal', 'add-author-btn', 'close-author-modal', 'save-author-btn', 'new-author-name', 'authors-select', '/admin/authors/create-ajax');
+    setupModal('publisher-modal', 'add-publisher-btn', 'close-publisher-modal', 'save-publisher-btn', 'new-publisher-name', 'publishers-select', '/admin/publishers/create-ajax');
+</script>

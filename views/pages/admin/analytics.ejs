@@ -1,0 +1,337 @@
+<h1>Аналитика и Отчеты</h1>
+<p>Интерактивная панель для анализа ключевых показателей магазина.</p>
+
+<div class="form-container" style="max-width: 100%; margin: 0 0 30px 0; padding: 20px;">
+    <form action="/admin/analytics" method="GET" class="filter-form">
+        <div class="form-group">
+            <label for="startDate">Дата начала</label>
+            <input type="date" name="startDate" id="startDate" class="form-control"
+                value="<%= locals.filters && filters.startDate ? filters.startDate : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="endDate">Дата окончания</label>
+            <input type="date" name="endDate" id="endDate" class="form-control"
+                value="<%= locals.filters && filters.endDate ? filters.endDate : '' %>">
+        </div>
+        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+        <a href="/admin/analytics" class="btn btn-secondary">Сбросить</a>
+    </form>
+</div>
+
+<h2>Графики</h2>
+<div class="analytics-grid">
+    <div class="chart-container">
+        <h3>Динамика продаж (Выручка, ₽)</h3>
+        <canvas id="salesByMonthChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3>Топ-5 клиентов (потрачено, ₽)</h3>
+        <canvas id="topClientsChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3>Распределение продаж по категориям</h3>
+        <canvas id="salesByCategoryChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3>Топ-5 продаваемых книг (шт.)</h3>
+        <canvas id="topSellingBooksChart"></canvas>
+    </div>
+</div>
+
+<h2 style="margin-top: 40px;">Отчеты</h2>
+
+<div class="form-container" style="max-width: 100%; margin: 0 0 30px 0; padding: 20px;">
+    <form action="/admin/analytics" method="GET" class="filter-form">
+        <div class="form-group">
+            <label for="startDate">Дата начала</label>
+            <input type="date" name="startDate" id="startDate" class="form-control"
+                value="<%= locals.filters && filters.startDate ? filters.startDate : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="endDate">Дата окончания</label>
+            <input type="date" name="endDate" id="endDate" class="form-control"
+                value="<%= locals.filters && filters.endDate ? filters.endDate : '' %>">
+        </div>
+        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+        <a href="/admin/analytics" class="btn btn-secondary">Сбросить</a>
+    </form>
+</div>
+
+<h2>Графики</h2>
+<div class="analytics-grid">
+    <div class="chart-container">
+        <h3>Динамика продаж (Выручка, ₽)</h3>
+        <canvas id="salesByMonthChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3>Топ-5 клиентов (потрачено, ₽)</h3>
+        <canvas id="topClientsChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3>Распределение продаж по категориям</h3>
+        <canvas id="salesByCategoryChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3>Топ-5 продаваемых книг (шт.)</h3>
+        <canvas id="topSellingBooksChart"></canvas>
+    </div>
+</div>
+
+<h2 style="margin-top: 40px;">Отчеты</h2>
+
+<!-- Отчет 1: Детализированный отчет по продажам -->
+<div class="report-container" style="margin-bottom: 30px;">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>Отчет по продажам (Master-Detail)</h3>
+        <a href="/admin/analytics?reportType=sales&startDate=<%= filters.startDate || '' %>&endDate=<%= filters.endDate || '' %>"
+            class="btn btn-sm btn-success">Скачать CSV</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID Заказа</th>
+                <th>Дата</th>
+                <th>Клиент</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th>Состав заказа</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% salesReport.forEach(order=> { %>
+                <tr>
+                    <td>#<%= order.id %>
+                    </td>
+                    <td>
+                        <%= new Date(order.created_at).toLocaleDateString('ru-RU') %>
+                    </td>
+                    <td>
+                        <%= order.client_name %>
+                    </td>
+                    <td>
+                        <%= Number(order.total_amount).toFixed(2) %> ₽
+                    </td>
+                    <td><span class="status-badge status-<%= order.status %>">
+                            <%= order.status %>
+                        </span></td>
+                    <td>
+                        <ul style="padding-left: 15px; margin: 0;">
+                            <% order.items.forEach(item=> { %><li>
+                                    <%= item.title %> (x<%= item.quantity %>)
+                                </li>
+                                <% }) %>
+                        </ul>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Отчет 2: Остатки на складе -->
+<div class="report-container" style="margin-bottom: 30px;">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>Отчет по остаткам на складе</h3>
+        <a href="/admin/analytics?reportType=stock" class="btn btn-sm btn-success">Скачать CSV</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Остаток</th>
+                <th>Цена</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% stockReport.forEach(book=> { %><tr
+                    style="<%= book.stock_quantity < 5 ? 'background-color: #f8d7da;' : '' %>">
+                    <td>
+                        <%= book.id %>
+                    </td>
+                    <td>
+                        <%= book.title %>
+                    </td>
+                    <td>
+                        <%= book.stock_quantity %> шт.
+                    </td>
+                    <td>
+                        <%= Number(book.price).toFixed(2) %> ₽
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Отчет 3: Популярность авторов -->
+<div class="report-container" style="margin-bottom: 30px;">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>Отчет по популярности авторов</h3>
+        <a href="/admin/analytics?reportType=authors&startDate=<%= filters.startDate || '' %>&endDate=<%= filters.endDate || '' %>"
+            class="btn btn-sm btn-success">Скачать CSV</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Автор</th>
+                <th>Продано книг (шт)</th>
+                <th>Общая выручка</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% authorReport.forEach(author=> { %><tr>
+                    <td>
+                        <%= author.name %>
+                    </td>
+                    <td>
+                        <%= author.items_sold %>
+                    </td>
+                    <td>
+                        <%= Number(author.total_revenue).toFixed(2) %> ₽
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Отчет 4: Популярность издательств -->
+<div class="report-container" style="margin-bottom: 30px;">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>Отчет по популярности издательств</h3>
+        <a href="/admin/analytics?reportType=publishers&startDate=<%= filters.startDate || '' %>&endDate=<%= filters.endDate || '' %>"
+            class="btn btn-sm btn-success">Скачать CSV</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Издательство</th>
+                <th>Продано книг (шт)</th>
+                <th>Общая выручка</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% publisherReport.forEach(p=> { %><tr>
+                    <td>
+                        <%= p.name %>
+                    </td>
+                    <td>
+                        <%= p.items_sold %>
+                    </td>
+                    <td>
+                        <%= Number(p.total_revenue).toFixed(2) %> ₽
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Отчет 5: Активность клиентов -->
+<div class="report-container" style="margin-bottom: 30px;">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>Отчет по активности клиентов</h3>
+        <a href="/admin/analytics?reportType=clients&startDate=<%= filters.startDate || '' %>&endDate=<%= filters.endDate || '' %>"
+            class="btn btn-sm btn-success">Скачать CSV</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Клиент</th>
+                <th>Email</th>
+                <th>Кол-во заказов</th>
+                <th>Потрачено всего</th>
+                <th>Последний заказ</th>
+                <th>Отзывов написано</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% clientReport.forEach(c=> { %><tr>
+                    <td>
+                        <%= c.full_name %>
+                    </td>
+                    <td>
+                        <%= c.email %>
+                    </td>
+                    <td>
+                        <%= c.order_count %>
+                    </td>
+                    <td>
+                        <%= Number(c.total_spent).toFixed(2) %> ₽
+                    </td>
+                    <td>
+                        <%= c.last_order_date ? new Date(c.last_order_date).toLocaleDateString('ru-RU') : 'Нет заказов'
+                            %>
+                    </td>
+                    <td>
+                        <%= c.review_count %>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Отчет 6: Последние отзывы -->
+<div class="report-container">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>Отчет по последним отзывам</h3>
+        <a href="/admin/analytics?reportType=reviews" class="btn btn-sm btn-success">Скачать CSV</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Книга</th>
+                <th>Пользователь</th>
+                <th>Оценка</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% reviewReport.forEach(r=> { %><tr>
+                    <td>
+                        <%= r.id %>
+                    </td>
+                    <td>
+                        <%= r.title %>
+                    </td>
+                    <td>
+                        <%= r.full_name %>
+                    </td>
+                    <td>
+                        <%= r.rating %>/5
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<% contentFor('scripts', ` <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    try {
+    // Данные теперь берутся напрямую из EJS переменных
+    const salesByMonth = ${JSON.stringify(salesByMonth)};
+    const topClients = ${JSON.stringify(topClients)};
+    const salesByCategory = ${JSON.stringify(salesByCategory)};
+    const topSellingBooks = ${JSON.stringify(topSellingBooks)};
+
+    if(salesByMonth && salesByMonth.length) new Chart(document.getElementById('salesByMonthChart'), { type: 'line',
+    data: { labels: salesByMonth.map(d => d.month), datasets: [{ label: 'Выручка', data: salesByMonth.map(d =>
+    d.total_revenue), fill: true, borderColor: 'rgb(75, 192, 192)', tension: 0.1 }] } });
+    if(topClients && topClients.length) new Chart(document.getElementById('topClientsChart'), { type: 'bar', data: {
+    labels: topClients.map(d => d.full_name), datasets: [{ label: 'Потрачено', data: topClients.map(d => d.total_spent),
+    backgroundColor: '#00A99D' }] } });
+    if(salesByCategory && salesByCategory.length) new Chart(document.getElementById('salesByCategoryChart'), { type:
+    'pie', data: { labels: salesByCategory.map(d => d.category_name), datasets: [{ data: salesByCategory.map(d =>
+    d.total_revenue) }] } });
+    if(topSellingBooks && topSellingBooks.length) new Chart(document.getElementById('topSellingBooksChart'), { type:
+    'bar', data: { labels: topSellingBooks.map(d => d.title), datasets: [{ label: 'Продано штук', data:
+    topSellingBooks.map(d => d.total_quantity), backgroundColor: '#ffc107' }] }, options: { indexAxis: 'y' } });
+    } catch(e) {
+    console.error("Ошибка отрисовки графиков:", e);
+    }
+    });
+    </script>
+    `) %>

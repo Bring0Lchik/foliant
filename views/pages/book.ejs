@@ -1,0 +1,62 @@
+<div class="container">
+    <div class="book-detail-layout">
+        <div class="book-cover">
+            <img src="<%= book.cover_image_path %>" alt="Обложка книги <%= book.title %>">
+        </div>
+        <div class="book-info">
+            <h1><%= book.title %></h1>
+            <h3><%= book.authors %></h3>
+            <div class="book-info__price"><%= book.price %> ₽</div>
+            <form action="/cart/add/<%= book.id %>" method="POST" style="margin-bottom: 30px;">
+                <button class="btn btn-primary" style="padding: 15px 40px; font-size: 1.2rem;">
+                    <i class="fa-solid fa-cart-shopping"></i> Добавить в корзину
+                </button>
+            </form>
+
+            <h2>Описание</h2>
+            <p><%- book.description %></p>
+
+            <ul class="book-specs">
+                <% if(book.publisher_name) { %><li><strong>Издательство:</strong> <span><%= book.publisher_name %></span></li><% } %>
+                <% if(book.publication_year) { %><li><strong>Год издания:</strong> <span><%= book.publication_year %></span></li><% } %>
+                <% if(book.pages) { %><li><strong>Количество страниц:</strong> <span><%= book.pages %></span></li><% } %>
+                <% if(book.isbn) { %><li><strong>ISBN:</strong> <span><%= book.isbn %></span></li><% } %>
+                <% if(book.categories) { %><li><strong>Жанры:</strong> <span><%= book.categories %></span></li><% } %>
+            </ul>
+        </div>
+    </div>
+
+    <div class="book-reviews" style="margin-top: 50px;">
+        <h2>Отзывы (<%= reviews.length %>)</h2>
+        <% if (locals.user) { %>
+            <div class="form-container" style="margin: 20px 0; padding: 30px; max-width: 100%;">
+                <h4>Оставить свой отзыв</h4>
+                <form action="/review/<%= book.id %>" method="POST">
+                    <div class="form-group">
+                        <label for="rating">Оценка (1-5)</label>
+                        <input type="number" id="rating" name="rating" class="form-control" min="1" max="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Комментарий</label>
+                        <textarea id="comment" name="comment" rows="4" class="form-control" placeholder="Поделитесь вашими впечатлениями..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+        <% } else { %>
+            <p><a href="/login">Войдите</a>, чтобы оставить отзыв.</p>
+        <% } %>
+
+        <% if (reviews.length > 0) { %>
+            <% reviews.forEach(review => { %>
+                <div style="border-bottom: 1px solid var(--color-gray-medium); padding: 20px 0;">
+                    <p><strong><%= review.full_name %></strong> (Оценка: <%= '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating) %>)</p>
+                    <p style="margin-top: 5px;"><%= review.comment %></p>
+                    <small style="color: #6c757d;"><%= new Date(review.created_at).toLocaleDateString('ru-RU') %></small>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p>Отзывов пока нет. Будьте первым!</p>
+        <% } %>
+    </div>
+</div>

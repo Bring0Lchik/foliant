@@ -1,0 +1,152 @@
+<div class="container">
+    <h1>Ваша корзина</h1>
+    <% if (cart && cart.length > 0) { %>
+        <div id="cart-wrapper">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all-items" checked></th>
+                        <th>Товар</th>
+                        <th>Цена</th>
+                        <th>Количество</th>
+                        <th>Сумма</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="cart-items-body">
+                    <% cart.forEach(item => { %>
+                        <tr class="cart-row" data-book-id="<%= item.book_id %>">
+                            <td>
+                                <!-- Этот чекбокс будет использоваться для отправки в форму checkout -->
+                                <input type="checkbox" class="item-checkbox" checked>
+                            </td>
+                            <td>
+                                <div class="cart-item-title">
+                                    <img src="<%= item.cover_image_path %>" alt="<%= item.title %>">
+                                    <span><a href="/book/<%= item.book_id %>"><%= item.title %></a></span>
+                                </div>
+                            </td>
+                            <input type="hidden" class="item-price" value="<%= item.effective_price %>">
+                            <td class="price-display"><%= Number(item.effective_price).toFixed(2) %> ₽</td>
+                            <td>
+                                <div class="quantity-controls">
+                                    <input type="number" class="form-control item-quantity" value="<%= item.quantity %>" min="1" max="<%= item.stock_quantity %>" style="width: 70px; text-align: center;">
+                                </div>
+                            </td>
+                            <td class="item-total"><%= (Number(item.effective_price) * item.quantity).toFixed(2) %> ₽</td>
+                            <td>
+                                <button type="button" class="btn btn-sm remove-item-btn" style="background: transparent; border: none; color: var(--color-danger);" title="Удалить">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            
+            <div class="cart-total" id="cart-total-display"></div>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <!-- Форма, которая отправляет ID выбранных товаров на страницу /checkout -->
+                <form action="/checkout" method="POST" id="checkout-form">
+                    <button type="submit" class="btn btn-primary">Оформить выбранное</button>
+                </form>
+            </div>
+        </div>
+    <% } else { %>
+        <p>Ваша корзина пуста.</p>
+        <a href="/catalog" class="btn btn-primary">Перейти в каталог</a>
+    <% } %>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const cartWrapper = document.getElementById('cart-wrapper');
+    if (!cartWrapper) return;
+
+    const totalDisplay = document.getElementById('cart-total-display');
+    const selectAllCheckbox = document.getElementById('select-all-items');
+    const checkoutForm = document.getElementById('checkout-form');
+
+    const updateTotal = () => {
+        let currentTotal = 0;
+        const rows = cartWrapper.querySelectorAll('.cart-row');
+        rows.forEach(row => {
+            const checkbox = row.querySelector('.item-checkbox');
+            const price = parseFloat(row.querySelector('.item-price').value);
+            const quantityInput = row.querySelector('.item-quantity');
+            const quantity = parseInt(quantityInput.value, 10);
+            const itemTotalEl = row.querySelector('.item-total');
+            if(itemTotalEl) itemTotalEl.textContent = (price * quantity).toFixed(2) + ' ₽';
+            if (checkbox && checkbox.checked) {
+                currentTotal += price * quantity;
+            }
+        });
+        totalDisplay.textContent = `Итого: ${currentTotal.toFixed(2)} ₽`;
+    };
+
+    const sendUpdateRequest = async (bookId, quantity) => {
+        try {
+            const response = await fetch('/cart/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ book_id: bookId, quantity: quantity })
+            });
+            if (response.ok && quantity === 0) {
+                document.querySelector(`.cart-row[data-book-id="${bookId}"]`).remove();
+                updateTotal();
+            }
+        } catch (error) { console.error('Ошибка:', error); }
+    };
+
+    cartWrapper.addEventListener('change', e => {
+        const target = e.target;
+        if (target.id === 'select-all-items') {
+            cartWrapper.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = target.checked);
+        }
+        if (target.matches('.item-checkbox, #select-all-items, .item-quantity')) {
+            updateTotal();
+        }
+        if (target.matches('.item-quantity')) {
+            const row = target.closest('.cart-row');
+            sendUpdateRequest(row.dataset.bookId, target.value);
+        }
+    });
+
+    cartWrapper.addEventListener('click', e => {
+        const removeBtn = e.target.closest('.remove-item-btn');
+        if (removeBtn) {
+            const row = removeBtn.closest('.cart-row');
+            sendUpdateRequest(row.dataset.bookId, 0);
+        }
+    });
+
+    checkoutForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const selectedCheckboxes = cartWrapper.querySelectorAll('.item-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert('Пожалуйста, выберите хотя бы один товар.');
+            return;
+        }
+        // Очищаем форму и добавляем только нужные ID
+        checkoutForm.innerHTML = '';
+        selectedCheckboxes.forEach(checkbox => {
+            const bookId = checkbox.closest('.cart-row').dataset.bookId;
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'selected_items';
+            input.value = bookId;
+            checkoutForm.appendChild(input);
+        });
+        // Добавляем обратно кнопку, чтобы она тоже отправилась
+        const submitButton = document.createElement('button');
+        submitButton.type = 'submit';
+        submitButton.style.display = 'none';
+        checkoutForm.appendChild(submitButton);
+        
+        checkoutForm.submit();
+    });
+
+    updateTotal();
+});
+</script>

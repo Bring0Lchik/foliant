@@ -1,0 +1,41 @@
+<section class="hero-section">
+    <div class="container" style="text-align: center; padding: 60px 20px;">
+        <h1>Структура. Смысл. Стиль.</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 30px;">Откройте для себя мир новых идей и классических произведений.</p>
+        <a href="/catalog" class="btn btn-primary">Перейти в каталог</a>
+    </div>
+</section>
+
+<section class="featured-books">
+    <div class="container">
+        <h2>Новинки и бестселлеры</h2>
+        
+        <div class="catalog-grid">
+            <% if (locals.books && books.length > 0) { %>
+                <% books.forEach(book => { %>
+                    <article class="book-card">
+                        <a href="/book/<%= book.id %>" class="book-card__image-link">
+                            <img src="<%= book.cover_image_path %>" alt="<%= book.title %>" class="book-card__image">
+                        </a>
+                        <div class="book-card__content">
+                            <h3 class="book-card__title">
+                                <a href="/book/<%= book.id %>"><%= book.title %></a>
+                            </h3>
+                            <p class="book-card__author"><%= book.authors %></p>
+                            <div class="book-card__footer">
+                                <!-- ИСПРАВЛЕНА ЭТА СТРОКА -->
+                                <span class="book-card__price"><%= Number(book.price).toFixed(2) %> ₽</span>
+                                <form action="/cart/add/<%= book.id %>" method="POST">
+                                    <button class="btn btn-secondary btn-sm">В корзину</button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                <% }) %>
+            <% } else { %>
+                <p>Новинок пока нет.</p>
+            <% } %>
+        </div>
+
+    </div>
+</section>

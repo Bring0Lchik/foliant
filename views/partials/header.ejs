@@ -1,0 +1,45 @@
+<header class="site-header">
+    <div class="container header-container">
+        <% if (locals.isAdminPage) { %>
+            <a href="/admin" class="logo">
+                <img src="/images/LOGO_FOLIANT.png" alt="Логотип Фолиант">
+            </a>
+        <% } else { %>
+            <a href="/" class="logo">
+                <img src="/images/LOGO_FOLIANT.png" alt="Логотип Фолиант">
+            </a>
+        <% } %>
+        
+        <nav class="main-nav">
+            <ul>
+                <li><a href="/">Главная</a></li>
+                <li><a href="/catalog">Каталог</a></li>
+                <li><a href="/book/random">Мне повезет!</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <% if (user) { %>
+                <% if (user.role_id === 1) { %>
+                    <a href="/admin" class="btn btn-danger btn-sm">Админка</a>
+                <% } %>
+                <a href="/notifications" title="Уведомления">
+                    <i class="fa-solid fa-bell icon"></i>
+                    <% if (locals.unreadNotifications && unreadNotifications > 0) { %>
+                       <span class="notification-badge"><%= unreadNotifications %></span>
+                    <% } %>
+                </a>
+                <a href="/cart" title="Корзина">
+                    <i class="fa-solid fa-cart-shopping icon"></i>
+                    <% if (locals.cartItemCount && cartItemCount > 0) { %>
+                       <span class="notification-badge"><%= cartItemCount %></span>
+                    <% } %>
+                </a>
+                <a href="/profile" class="btn btn-secondary btn-sm">Профиль</a>
+                <a href="/logout">Выйти</a>
+            <% } else { %>
+                <a href="/login" class="btn btn-secondary">Войти</a>
+                <a href="/register" class="btn btn-primary">Регистрация</a>
+            <% } %>
+        </div>
+    </div>
+</header>

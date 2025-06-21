@@ -1,0 +1,36 @@
+<h1>Управление заказами</h1>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>ID Заказа</th>
+            <th>Клиент</th>
+            <th>Сумма</th>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Изменить статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% orders.forEach(order => { %>
+            <tr>
+                <td>#<%= order.id %></td>
+                <td><%= order.full_name %> (<%= order.email %>)</td>
+                <td><%= order.total_amount %> ₽</td>
+                <td><%= new Date(order.created_at).toLocaleString('ru-RU') %></td>
+                <td><span class="btn" style="cursor: default; background-color: #e9ecef; color: #495057;"><%= order.status %></span></td>
+                <td>
+                    <form action="/admin/orders/status" method="POST">
+                        <input type="hidden" name="order_id" value="<%= order.id %>">
+                        <select name="status" class="form-control" onchange="this.form.submit()">
+                            <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>В обработке</option>
+                            <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Отправлен</option>
+                            <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Доставлен</option>
+                            <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Отменен</option>
+                        </select>
+                    </form>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
