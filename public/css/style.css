@@ -23,6 +23,19 @@
     --transition-speed: 0.3s;
 }
 
+/* --- Dark Theme Variables --- */
+body[data-theme="dark"] {
+    --color-black: #f0f0f0; /* Light gray for text on dark background */
+    --color-white: #1a1a1a; /* Dark background */
+    --color-gray-light: #2c2c2c; /* Slightly lighter dark for cards/elements */
+    --color-gray-medium: #3a3a3a; /* Borders and dividers */
+    --color-gray-dark: #5a5a5a; /* Hover states or less important elements */
+    --color-text: #e0e0e0; /* Main text color for dark theme */
+    --color-accent: #00C2B2; /* Accent color, can remain same or adjusted */
+    --color-accent-dark: #00A99D; /* Darker accent for hover */
+    --box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05); /* Softer shadow for dark theme */
+}
+
 *,
 *::before,
 *::after {
@@ -38,7 +51,7 @@ html {
 body {
     font-family: var(--font-body);
     color: var(--color-text);
-    background-color: var(--color-white);
+    background-color: var(--color-white); /* Fallback for browsers that don't support data-theme */
     line-height: 1.7;
     display: flex;
     flex-direction: column;
@@ -73,7 +86,7 @@ h3,
 h4 {
     font-family: var(--font-heading);
     font-weight: 700;
-    color: var(--color-black);
+    color: var(--color-black); /* Uses theme variable */
     line-height: 1.3;
     margin-bottom: 24px;
 }
@@ -155,9 +168,9 @@ h3 {
 
 /* --- ХЕДЕР И ФУТЕР --- */
 .site-header {
-    background-color: var(--color-white);
-    border-bottom: 1px solid var(--color-gray-medium);
-    box-shadow: var(--box-shadow);
+    background-color: var(--color-white); /* Uses theme variable */
+    border-bottom: 1px solid var(--color-gray-medium); /* Uses theme variable */
+    box-shadow: var(--box-shadow); /* Uses theme variable */
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -175,12 +188,12 @@ h3 {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: var(--color-black);
+    color: var(--color-black); /* Uses theme variable */
     height: 100%;
 }
 
 .logo:hover {
-    color: var(--color-black);
+    color: var(--color-black); /* Uses theme variable */
 }
 
 .logo img {
@@ -199,7 +212,7 @@ h3 {
     font-family: var(--font-heading);
     font-size: 1rem;
     font-weight: 500;
-    color: var(--color-text);
+    color: var(--color-text); /* Uses theme variable */
     padding-bottom: 5px;
     position: relative;
 }
@@ -240,8 +253,8 @@ h3 {
 }
 
 .site-footer {
-    background-color: var(--color-black);
-    color: #adb5bd;
+    background-color: var(--color-black); /* Uses theme variable */
+    color: var(--color-gray-dark); /* Uses theme variable */
     padding: 40px 0;
     margin-top: auto;
     text-align: center;
@@ -262,25 +275,31 @@ h3 {
 .form-control {
     width: 100%;
     padding: 12px;
-    border: 1px solid var(--color-gray-dark);
+    border: 1px solid var(--color-gray-dark); /* Uses theme variable */
     border-radius: var(--border-radius);
     font-size: 1rem;
+    background-color: var(--color-white); /* Form inputs background */
+    color: var(--color-text); /* Form inputs text color */
     transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
 .form-control:focus {
     border-color: var(--color-accent);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 169, 157, 0.2);
+    box-shadow: 0 0 0 3px rgba(0, 169, 157, 0.2); /* Consider adjusting alpha for dark theme */
+}
+
+body[data-theme="dark"] .form-control:focus {
+    box-shadow: 0 0 0 3px rgba(0, 194, 178, 0.25); /* Adjusted focus for dark theme */
 }
 
 .form-container {
     max-width: 500px;
     margin: 40px auto;
     padding: 40px;
-    background: var(--color-white);
+    background: var(--color-white); /* Uses theme variable */
     border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    box-shadow: var(--box-shadow); /* Uses theme variable */
 }
 
 .error {
@@ -298,9 +317,9 @@ h3 {
 }
 
 .book-card {
-    background-color: var(--color-white);
+    background-color: var(--color-white); /* Uses theme variable */
     border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    box-shadow: var(--box-shadow); /* Uses theme variable */
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -309,13 +328,17 @@ h3 {
 
 .book-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Default theme hover */
+}
+
+body[data-theme="dark"] .book-card:hover {
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.08); /* Dark theme hover */
 }
 
 .book-card__image-link {
     display: block;
     height: 350px;
-    background-color: var(--color-gray-light);
+    background-color: var(--color-gray-light); /* Uses theme variable */
 }
 
 .book-card__image {
@@ -339,13 +362,17 @@ h3 {
 }
 
 .book-card__title a {
-    color: var(--color-text);
+    color: var(--color-text); /* Uses theme variable */
 }
 
 .book-card__author {
-    color: #6c757d;
+    color: #6c757d; /* Fallback, consider a variable if more shades are needed */
     margin-bottom: 15px;
     font-size: 0.9rem;
+}
+
+body[data-theme="dark"] .book-card__author {
+    color: var(--color-gray-dark); /* Adjusted for dark theme */
 }
 
 .book-card__footer {
@@ -358,7 +385,7 @@ h3 {
 .book-card__price {
     font-size: 1.4rem;
     font-weight: 700;
-    color: var(--color-black);
+    color: var(--color-black); /* Uses theme variable */
 }
 
 /* --- НОВЫЕ СТИЛИ --- */
@@ -380,7 +407,7 @@ h3 {
 
 .notification-list-item {
     padding: 15px;
-    border-bottom: 1px solid var(--color-gray-medium);
+    border-bottom: 1px solid var(--color-gray-medium); /* Uses theme variable */
     display: flex;
     gap: 15px;
     align-items: center;
@@ -405,7 +432,11 @@ h3 {
 }
 
 .notification-icon.system {
-    color: #6c757d;
+    color: #6c757d; /* Fallback */
+}
+
+body[data-theme="dark"] .notification-icon.system {
+    color: var(--color-gray-dark); /* Adjusted for dark theme */
 }
 
 .notification-message {
@@ -414,11 +445,15 @@ h3 {
 
 .notification-time {
     font-size: 0.8rem;
-    color: #6c757d;
+    color: #6c757d; /* Fallback */
+}
+
+body[data-theme="dark"] .notification-time {
+    color: var(--color-gray-dark); /* Adjusted for dark theme */
 }
 
 .special-offer-card {
-    background-color: var(--color-gray-light);
+    background-color: var(--color-gray-light); /* Uses theme variable */
     padding: 20px;
     border-radius: var(--border-radius);
     margin-bottom: 20px;
@@ -482,22 +517,27 @@ h3 {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5); /* Default backdrop */
+}
+
+body[data-theme="dark"] .modal {
+    background-color: rgba(0, 0, 0, 0.7); /* Darker backdrop for dark theme */
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: var(--color-white); /* Uses theme variable */
     margin: 10% auto;
     padding: 30px;
-    border: 1px solid #888;
+    border: 1px solid var(--color-gray-medium); /* Uses theme variable */
     width: 80%;
     max-width: 500px;
     border-radius: var(--border-radius);
     position: relative;
+    box-shadow: var(--box-shadow);
 }
 
 .close-modal {
-    color: #aaa;
+    color: var(--color-gray-dark); /* Uses theme variable */
     position: absolute;
     top: 10px;
     right: 20px;
@@ -507,7 +547,7 @@ h3 {
 
 .close-modal:hover,
 .close-modal:focus {
-    color: black;
+    color: var(--color-black); /* Uses theme variable */
     text-decoration: none;
     cursor: pointer;
 }
@@ -527,10 +567,10 @@ h3 {
 }
 
 .chart-container {
-    background: var(--color-white);
+    background: var(--color-white); /* Uses theme variable */
     padding: 20px;
     border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    box-shadow: var(--box-shadow); /* Uses theme variable */
 }
 
 /* --- АДМИНКА --- */
@@ -541,9 +581,14 @@ h3 {
 .admin-sidebar {
     width: 260px;
     flex-shrink: 0;
-    background-color: var(--color-black);
-    color: var(--color-white);
-    min-height: calc(100vh - 80px);
+    background-color: var(--color-black); /* Uses theme variable (dark by default for sidebar) */
+    color: var(--color-white); /* Uses theme variable (light text for dark sidebar) */
+    min-height: calc(100vh - 80px); /* Assuming header height is 80px */
+}
+
+body[data-theme="dark"] .admin-sidebar {
+    background-color: #121212; /* Slightly different dark for sidebar in dark mode if needed */
+    color: var(--color-text); /* Main text color for dark theme */
 }
 
 .admin-nav {
@@ -551,7 +596,7 @@ h3 {
 }
 
 .admin-nav a {
-    color: #dee2e6;
+    color: #dee2e6; /* Default light gray for links */
     display: flex;
     align-items: center;
     gap: 15px;
@@ -561,10 +606,19 @@ h3 {
     transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
 }
 
+body[data-theme="dark"] .admin-nav a {
+    color: var(--color-gray-light); /* Link color in dark mode */
+}
+
 .admin-nav a:hover,
 .admin-nav a.active {
     background-color: var(--color-accent);
-    color: var(--color-white);
+    color: var(--color-white); /* Text color on accent background */
+}
+
+body[data-theme="dark"] .admin-nav a:hover,
+body[data-theme="dark"] .admin-nav a.active {
+    color: #ffffff; /* Ensure contrast on accent background in dark mode */
 }
 
 .admin-nav .icon {
@@ -576,14 +630,18 @@ h3 {
 .admin-content {
     flex-grow: 1;
     padding: 40px;
-    background-color: #f1f3f5;
+    background-color: #f1f3f5; /* Default light background for admin content */
+}
+
+body[data-theme="dark"] .admin-content {
+    background-color: #212121; /* Dark background for admin content */
 }
 
 .admin-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: var(--color-white);
-    box-shadow: var(--box-shadow);
+    background-color: var(--color-white); /* Uses theme variable */
+    box-shadow: var(--box-shadow); /* Uses theme variable */
     border-radius: var(--border-radius);
     overflow: hidden;
 }
@@ -591,13 +649,13 @@ h3 {
 .admin-table th,
 .admin-table td {
     padding: 15px;
-    border-bottom: 1px solid var(--color-gray-medium);
+    border-bottom: 1px solid var(--color-gray-medium); /* Uses theme variable */
     text-align: left;
     vertical-align: middle;
 }
 
 .admin-table th {
-    background-color: #f8f9fa;
+    background-color: var(--color-gray-light); /* Uses theme variable */
 }
 
 .table-actions {
@@ -618,30 +676,35 @@ h3 {
     display: block;
     padding: 8px 15px;
     border-radius: var(--border-radius);
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-dark);
+    background-color: var(--color-white); /* Uses theme variable */
+    border: 1px solid var(--color-gray-dark); /* Uses theme variable */
+    color: var(--color-text); /* Pagination link text color */
 }
 
 .pagination a:hover {
-    background-color: var(--color-gray-light);
+    background-color: var(--color-gray-light); /* Uses theme variable */
 }
 
 .pagination .active {
     background-color: var(--color-accent);
-    color: var(--color-white);
+    color: var(--color-white); /* Text color on accent background */
     border-color: var(--color-accent);
 }
 
+body[data-theme="dark"] .pagination .active {
+    color: #ffffff; /* Ensure contrast on accent background in dark mode */
+}
+
 .pagination .disabled {
-    color: #adb5bd;
-    background-color: var(--color-gray-light);
+    color: var(--color-gray-dark); /* Uses theme variable for disabled text */
+    background-color: var(--color-gray-light); /* Uses theme variable for disabled background */
     cursor: not-allowed;
 }
 
 .catalog-filters {
     margin-bottom: 40px;
     padding: 20px;
-    background-color: var(--color-gray-light);
+    background-color: var(--color-gray-light); /* Uses theme variable */
     border-radius: var(--border-radius);
 }
 
@@ -671,7 +734,7 @@ h3 {
 .book-cover img {
     width: 100%;
     border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    box-shadow: var(--box-shadow); /* Uses theme variable */
 }
 
 .book-info__price {
@@ -684,7 +747,7 @@ h3 {
 .book-specs {
     list-style: none;
     margin: 30px 0;
-    background-color: var(--color-gray-light);
+    background-color: var(--color-gray-light); /* Uses theme variable */
     padding: 25px;
     border-radius: var(--border-radius);
 }
@@ -693,7 +756,7 @@ h3 {
     display: flex;
     justify-content: space-between;
     padding: 10px 0;
-    border-bottom: 1px solid var(--color-gray-medium);
+    border-bottom: 1px solid var(--color-gray-medium); /* Uses theme variable */
     font-size: 1rem;
 }
 
@@ -702,7 +765,7 @@ h3 {
 }
 
 .book-specs strong {
-    color: var(--color-black);
+    color: var(--color-black); /* Uses theme variable */
     font-weight: 600;
 }
 
@@ -716,13 +779,13 @@ h3 {
 .cart-table td {
     padding: 15px;
     text-align: left;
-    border-bottom: 1px solid var(--color-gray-medium);
+    border-bottom: 1px solid var(--color-gray-medium); /* Uses theme variable */
     vertical-align: middle;
 }
 
 .cart-table th {
     font-family: var(--font-heading);
-    background-color: var(--color-gray-light);
+    background-color: var(--color-gray-light); /* Uses theme variable */
 }
 
 .cart-item-title {
@@ -743,4 +806,24 @@ h3 {
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 20px;
+}
+
+/* Theme Toggle Button */
+#theme-toggle-button {
+    background-color: transparent;
+    border: 1px solid var(--color-gray-dark);
+    color: var(--color-text);
+    padding: 8px 12px; /* Adjusted padding */
+}
+
+#theme-toggle-button:hover {
+    background-color: var(--color-gray-light);
+}
+
+body[data-theme="dark"] #theme-toggle-button {
+    border-color: var(--color-gray-medium);
+}
+
+body[data-theme="dark"] #theme-toggle-button:hover {
+    background-color: var(--color-gray-medium);
 }
