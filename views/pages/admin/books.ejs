@@ -1,54 +1,81 @@
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h1>Управление книгами</h1>
-    <a href="/admin/books/add" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Добавить книгу</a>
+    <a href="/admin/books/add" class="btn btn-primary">Добавить книгу</a>
+</div>
+
+<div class="form-container" style="max-width: 100%; margin: 0 0 30px 0; padding: 20px;">
+    <form action="/admin/books" method="GET" class="filter-form">
+        <div class="form-group" style="flex-grow: 3;">
+            <label for="search">Поиск по названию</label>
+            <input type="text" name="search" id="search" class="form-control" value="<%= searchQuery || '' %>" placeholder="Введите название книги...">
+        </div>
+        <button type="submit" class="btn btn-primary">Найти</button>
+        <a href="/admin/books" class="btn btn-secondary">Сбросить</a>
+    </form>
 </div>
 
 <table class="admin-table">
     <thead>
         <tr>
             <th>ID</th>
+            <th>Обложка</th>
             <th>Название</th>
+            <th>Автор(ы)</th>
             <th>Цена</th>
             <th>Остаток</th>
+            <th>Рейтинг</th>
             <th>Действия</th>
         </tr>
     </thead>
     <tbody>
-        <% books.forEach(book => { %>
+        <% if (books && books.length > 0) { %>
+            <% books.forEach(book => { %>
+                <tr>
+                    <td><%= book.id %></td>
+                    <td><img src="<%= book.cover_image_path %>" alt="<%= book.title %>" style="width: 50px; height: auto; border-radius: 4px;"></td>
+                    <td><%= book.title %></td>
+                    <td><%= book.authors || 'Не указан' %></td>
+                    <td><%= Number(book.price).toFixed(2) %> ₽</td>
+                    <td style="<%= book.stock_quantity < 10 ? 'color:red; font-weight:bold;' : '' %>">
+                        <%= book.stock_quantity %> шт.
+                    </td>
+                    <td><i class="fa-solid fa-star" style="color: #f8c100;"></i> <%= Number(book.rating).toFixed(2) %></td>
+                    <td class="table-actions">
+                        <a href="/admin/books/edit/<%= book.id %>" class="btn btn-sm btn-warning">Редактировать</a>
+                        <form action="/admin/books/delete/<%= book.id %>" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить эту книгу?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        <% } else { %>
             <tr>
-                <td><%= book.id %></td>
-                <td><%= book.title %></td>
-                <td><%= book.price %> ₽</td>
-                <td><%= book.stock_quantity %> шт.</td>
-                <td class="table-actions">
-                    <a href="/admin/books/edit/<%= book.id %>" class="btn btn-secondary"><i class="fa-solid fa-pencil"></i></a>
-                    <form action="/admin/books/delete/<%= book.id %>" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить эту книгу?');">
-                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></button>
-                    </form>
-                </td>
+                <td colspan="8" style="text-align: center; padding: 20px;">Книги не найдены.</td>
             </tr>
-        <% }) %>
+        <% } %>
     </tbody>
 </table>
 
 <% if (totalPages > 1) { %>
-    <nav>
-        <ul class="pagination">
-            <% if (currentPage > 1) { %>
-                <li><a href="/admin/books?page=<%= currentPage - 1 %>">«</a></li>
-            <% } else { %>
-                <li class="disabled"><span>«</span></li>
-            <% } %>
+<nav>
+    <ul class="pagination">
+        <% if (currentPage > 1) { %>
+            <li class="page-item">
+                <a class="page-link" href="/admin/books?page=<%= currentPage - 1 %>&search=<%= searchQuery %>">Назад</a>
+            </li>
+        <% } %>
 
-            <% for (let i = 1; i <= totalPages; i++) { %>
-                <li><a href="/admin/books?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
-            <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                <a class="page-link" href="/admin/books?page=<%= i %>&search=<%= searchQuery %>"><%= i %></a>
+            </li>
+        <% } %>
 
-            <% if (currentPage < totalPages) { %>
-                <li><a href="/admin/books?page=<%= currentPage + 1 %>">»</a></li>
-            <% } else { %>
-                 <li class="disabled"><span>»</span></li>
-            <% } %>
-        </ul>
-    </nav>
+        <% if (currentPage < totalPages) { %>
+            <li class="page-item">
+                <a class="page-link" href="/admin/books?page=<%= currentPage + 1 %>&search=<%= searchQuery %>">Вперед</a>
+            </li>
+        <% } %>
+    </ul>
+</nav>
 <% } %>

@@ -9,19 +9,24 @@
             <th>Дата</th>
             <th>Статус</th>
             <th>Изменить статус</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
-        <% orders.forEach(order => { %>
+        <% if (orders && orders.length > 0) { %>
+            <% orders.forEach(order => { %>
             <tr>
                 <td>#<%= order.id %></td>
                 <td><%= order.full_name %> (<%= order.email %>)</td>
-                <td><%= order.total_amount %> ₽</td>
+                <td><%= Number(order.total_amount).toFixed(2) %> ₽</td>
                 <td><%= new Date(order.created_at).toLocaleString('ru-RU') %></td>
-                <td><span class="btn" style="cursor: default; background-color: #e9ecef; color: #495057;"><%= order.status %></span></td>
+                <td>
+                    <span class="status-badge status-<%= order.status %>"><%= order.status %></span>
+                </td>
                 <td>
                     <form action="/admin/orders/status" method="POST">
                         <input type="hidden" name="order_id" value="<%= order.id %>">
+                        <input type="hidden" name="user_id" value="<%= order.user_id %>">
                         <select name="status" class="form-control" onchange="this.form.submit()">
                             <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>В обработке</option>
                             <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Отправлен</option>
@@ -30,7 +35,15 @@
                         </select>
                     </form>
                 </td>
+                <td>
+                    <a href="/admin/order/<%= order.id %>" class="btn btn-sm btn-secondary">Подробнее</a>
+                </td>
             </tr>
-        <% }) %>
+            <% }) %>
+        <% } else { %>
+            <tr>
+                <td colspan="7" style="text-align:center; padding: 20px;">Заказов пока нет.</td>
+            </tr>
+        <% } %>
     </tbody>
 </table>

@@ -1,0 +1,12 @@
+<h1><%= publisher.id ? 'Редактировать издательство' : 'Добавить новое издательство' %></h1>
+
+<form action="<%= publisher.id ? '/admin/publishers/edit/' + publisher.id : '/admin/publishers/add' %>" method="POST">
+    <div class="form-container" style="max-width: 600px; margin: 20px 0;">
+        <div class="form-group">
+            <label for="name">Название издательства</label>
+            <input type="text" name="name" id="name" class="form-control" value="<%= publisher.name || '' %>" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="/admin/publishers" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>

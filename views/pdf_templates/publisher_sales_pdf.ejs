@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"><title><%= title %></title><style>body{font-family:Arial,sans-serif;font-size:10pt;color:#333}h1,h2,h3{font-family:'Times New Roman',serif;color:#000;margin-bottom:.5em;page-break-after:avoid}h1{font-size:24pt;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:20px;text-align:center}h2{font-size:18pt;margin-top:25px;border-bottom:1px solid #ccc;padding-bottom:5px}h3{font-size:12pt;margin-top:15px;font-weight:700}table{width:100%;border-collapse:collapse;margin-top:10px;page-break-inside:auto}tr{page-break-inside:avoid;page-break-after:auto}th,td{border:1px solid #ddd;padding:6px;text-align:left;vertical-align:top;font-size:9pt}th{background-color:#f2f2f2;font-weight:700}.no-data{text-align:center;padding:20px;font-style:italic;color:#777}</style>
+</head>
+<body>
+    <h1><%= title %></h1>
+    <p style="text-align:center;font-size:9pt">Период: с <%= filters.startDate || 'начала времен' %> по <%= filters.endDate || 'сегодня' %></p>
+
+    <% if (publisherSalesReport && publisherSalesReport.length > 0) { %>
+        <% publisherSalesReport.forEach(publisher => { %>
+            <h3><%= publisher.publisher_name %></h3>
+            <p style="font-size:9pt">Общая выручка: <strong><%= Number(publisher.total_revenue||0).toFixed(2) %> ₽</strong> | Всего продано: <strong><%= Number(publisher.total_books_sold||0) %> шт.</strong></p>
+            <table>
+                <thead><tr><th>Книга</th><th>ISBN</th><th>Продано (шт)</th><th>Выручка (₽)</th><th>Остаток</th></tr></thead>
+                <tbody>
+                    <% if (publisher.books.length > 0) { %>
+                        <% publisher.books.forEach(book => { %>
+                            <tr><td><%= book.title %></td><td><%= book.isbn || 'N/A' %></td><td><%= Number(book.sold_quantity||0) %></td><td><%= Number(book.revenue||0).toFixed(2) %></td><td><%= Number(book.stock_quantity||0) %></td></tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5" class="no-data">Нет данных о продажах книг этого издательства за период.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        <% }) %>
+    <% } else { %>
+        <div class="no-data">Нет данных за выбранный период.</div>
+    <% } %>
+
+    <p style="text-align:right;font-size:8pt;color:#777;margin-top:30px">Дата формирования: <%= new Date().toLocaleString('ru-RU') %></p>
+</body>
+</html>

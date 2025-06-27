@@ -6,7 +6,25 @@
         <div class="book-info">
             <h1><%= book.title %></h1>
             <h3><%= book.authors %></h3>
-            <div class="book-info__price"><%= book.price %> ₽</div>
+
+            <% if(book.rating > 0) { %>
+                <div class="book-rating" style="margin-bottom: 15px; font-size: 1.2rem; color: #f8c100;">
+                    <% for(let i = 1; i <= 5; i++) { %>
+                        <% if (i <= book.rating) { %>
+                            <i class="fa-solid fa-star"></i>
+                        <% } else if (i - 0.5 <= book.rating) { %>
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                        <% } else { %>
+                            <i class="fa-regular fa-star"></i>
+                        <% } %>
+                    <% } %>
+                    <span style="color: #6c757d; font-size: 1rem; margin-left: 10px;">
+                        <%= Number(book.rating).toFixed(2) %> (оценок: <%= reviews.length %>)
+                    </span>
+                </div>
+            <% } %>
+
+            <div class="book-info__price"><%= Number(book.price).toFixed(2) %> ₽</div>
             <form action="/cart/add/<%= book.id %>" method="POST" style="margin-bottom: 30px;">
                 <button class="btn btn-primary" style="padding: 15px 40px; font-size: 1.2rem;">
                     <i class="fa-solid fa-cart-shopping"></i> Добавить в корзину
@@ -49,11 +67,12 @@
 
         <% if (reviews.length > 0) { %>
             <% reviews.forEach(review => { %>
-                <div style="border-bottom: 1px solid var(--color-gray-medium); padding: 20px 0;">
-                    <p><strong><%= review.full_name %></strong> (Оценка: <%= '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating) %>)</p>
-                    <p style="margin-top: 5px;"><%= review.comment %></p>
-                    <small style="color: #6c757d;"><%= new Date(review.created_at).toLocaleDateString('ru-RU') %></small>
-                </div>
+            <div style="border-bottom: 1px solid var(--color-gray-medium); padding: 20px 0;">
+                <p><strong><%= review.full_name %></strong>
+                    (Оценка: <%= '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating) %>)</p>
+                <p style="margin-top: 5px;"><%= review.comment %></p>
+                <small style="color: #6c757d;"><%= new Date(review.created_at).toLocaleDateString('ru-RU') %></small>
+            </div>
             <% }) %>
         <% } else { %>
             <p>Отзывов пока нет. Будьте первым!</p>

@@ -26,5 +26,6 @@ router.post('/review/:bookId', requireAuth, mainController.review_post);
 router.get('/notifications', requireAuth, mainController.notifications_get);
 router.post('/notifications/mark-read', requireAuth, mainController.notifications_mark_read_post);
 router.post('/offer/:id/accept', requireAuth, mainController.offer_accept_post);
+router.get('/order/:id', requireAuth, mainController.order_details_get);
 
 module.exports = router;

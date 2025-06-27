@@ -1,43 +1,42 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админка - <%= title %>
-    </title>
+    <title>Админка - <%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
-
 <body>
 
-    <%- include('../partials/header', { isAdminPage: true }) %>
+<%- include('../partials/header', { isAdminPage: true, user: locals.user, unreadNotifications: locals.unreadNotifications, cartItemCount: locals.cartItemCount }) %>
 
-        <div class="admin-layout">
-            <aside class="admin-sidebar">
-                <nav class="admin-nav">
-                    <a href="/admin"><i class="fa-solid fa-house icon"></i> Главная</a>
-                    <a href="/admin/analytics"><i class="fa-solid fa-chart-line icon"></i> Аналитика</a>
-                    <a href="/admin/books"><i class="fa-solid fa-book icon"></i> Книги</a>
-                    <a href="/admin/orders"><i class="fa-solid fa-box-archive icon"></i> Заказы</a>
-                    <a href="/admin/users"><i class="fa-solid fa-users icon"></i> Пользователи</a>
-                </nav>
-            </aside>
-            <main class="admin-content">
-                <%- body %>
-            </main>
-        </div>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <nav class="admin-nav">
+            <a href="/admin"><i class="fa-solid fa-house icon"></i> Главная</a>
+            <a href="/admin/analytics"><i class="fa-solid fa-chart-line icon"></i> Аналитика</a>
+            <a href="/admin/books"><i class="fa-solid fa-book icon"></i> Книги</a>
+            <a href="/admin/orders"><i class="fa-solid fa-box-archive icon"></i> Заказы</a>
+            <a href="/admin/users"><i class="fa-solid fa-users icon"></i> Пользователи</a>
+            <a href="/admin/publishers"><i class="fa-solid fa-building icon"></i> Издательства</a>
+        </nav>
+    </aside>
 
-        <!-- Библиотека для графиков, подключается всегда для страниц админки -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <main class="admin-content">
+        <%- body %>
+    </main>
+</div>
 
-        <!-- ======================= КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ ======================= -->
-        <!-- Выводим скрипты, только ЕСЛИ они были определены на странице -->
-        <% if (locals.scripts) { %>
-            <%- scripts %>
-                <% } %>
-                    <!-- ==================================================================== -->
+<!-- 
+    Если дочерний шаблон определит блок 'scripts' с помощью contentFor,
+    его содержимое будет доступно как локальная переменная `scripts` и вставлено здесь.
+-->
+<% if (locals.scripts) { %>
+    <%- scripts %>
+<% } %>
+
 </body>
-
 </html>

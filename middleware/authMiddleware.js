@@ -22,7 +22,7 @@ const checkUser = (req, res, next) => {
                 } catch (dbError) {
                     console.error('Ошибка в checkUser:', dbError);
                     res.locals.user = null;
-                    next(); // <-- Вызываем next в любом случае
+                    next(); // <-- ИСПРАВЛЕНИЕ: Добавлен вызов next() даже при ошибке
                 }
             }
         });
@@ -32,7 +32,6 @@ const checkUser = (req, res, next) => {
     }
 };
 
-// ... остальные функции requireAuth и requireAdmin без изменений ...
 const requireAuth = (req, res, next) => {
     if (!res.locals.user) {
         const returnTo = req.originalUrl;
@@ -50,6 +49,5 @@ const requireAdmin = (req, res, next) => {
     }
     next();
 };
-
 
 module.exports = { checkUser, requireAuth, requireAdmin };

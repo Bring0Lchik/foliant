@@ -1,0 +1,34 @@
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>Управление издательствами</h1>
+    <a href="/admin/publishers/add" class="btn btn-primary">Добавить издательство</a>
+</div>
+
+<% if (publishers.length > 0) { %>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название издательства</th>
+                <th>Количество книг</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% publishers.forEach(publisher => { %>
+                <tr>
+                    <td><%= publisher.id %></td>
+                    <td><%= publisher.name %></td>
+                    <td><%= publisher.book_count %></td>
+                    <td class="table-actions">
+                        <a href="/admin/publishers/<%= publisher.id %>" class="btn btn-sm btn-info">Посмотреть</a>
+                        <form action="/admin/publishers/delete/<%= publisher.id %>" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить это издательство? Все книги этого издательства потеряют с ним связь.');">
+                            <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>Издательства еще не добавлены.</p>
+<% } %>

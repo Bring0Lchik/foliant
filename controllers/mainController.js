@@ -7,7 +7,6 @@ const Notification = require('../models/notificationModel');
 const SpecialOffer = require('../models/specialOfferModel');
 const db = require('../config/db');
 
-// Хелпер, чтобы не повторять код. Он добавляет ключ API в данные для рендера.
 const renderWithApiKey = (res, page, data) => {
     res.render(page, {
         ...data,
@@ -31,15 +30,18 @@ module.exports.catalog_get = async (req, res) => {
         const books = await Book.findAll(filters);
         const [authors] = await db.query('SELECT id, name FROM authors ORDER BY name');
         const [publishers] = await db.query('SELECT id, name FROM publishers ORDER BY name');
-        renderWithApiKey(res, 'pages/catalog', { 
-            title: 'Каталог', 
-            books, 
-            filters, 
-            authors, 
-            publishers
+        const [allCategories] = await db.query('SELECT id, name FROM categories ORDER BY name');
+
+        renderWithApiKey(res, 'pages/catalog', {
+            title: 'Каталог',
+            books,
+            filters,
+            authors,
+            publishers,
+            allCategories
         });
     } catch (err) {
-        console.error(err);
+        console.error("Ошибка на странице каталога:", err);
         res.status(500).send("Ошибка сервера");
     }
 };
@@ -75,10 +77,10 @@ module.exports.profile_get = async (req, res) => {
     try {
         const profile = await User.findById(req.user.id);
         const orders = await Order.findByUser(req.user.id);
-        renderWithApiKey(res, 'pages/profile', { 
-            title: 'Личный кабинет', 
-            profile, 
-            orders 
+        renderWithApiKey(res, 'pages/profile', {
+            title: 'Личный кабинет',
+            profile,
+            orders
         });
     } catch (err) {
         console.error("Ошибка на странице профиля:", err);
@@ -148,7 +150,7 @@ module.exports.checkout_post = async (req, res) => {
             return res.redirect('/cart');
         }
         const total = items.reduce((sum, item) => sum + (Number(item.effective_price) * item.quantity), 0);
-        
+
         renderWithApiKey(res, 'pages/checkout', {
             title: 'Оформление заказа',
             items,
@@ -157,7 +159,7 @@ module.exports.checkout_post = async (req, res) => {
         });
     } catch (err) {
         console.error(err);
-        res.status(500).send("Ошибка сервера");
+        res.status(500).send("Ошибка Сервера");
     }
 };
 
@@ -166,7 +168,9 @@ module.exports.order_post = async (req, res) => {
     if (!selected_items || !delivery_address) {
         return res.redirect('/cart?error=invalid_checkout_data');
     }
-    const selectedIds = Array.isArray(selected_items) ? selected_items.map(id => parseInt(id, 10)) : [parseInt(selected_items, 10)];
+
+    const selectedIds = Array.isArray(selected_items) ?
+        selected_items.map(id => parseInt(id, 10)) : [parseInt(selected_items, 10)];
 
     try {
         await User.updateProfile(req.user.id, req.user.full_name, delivery_address);
@@ -174,6 +178,7 @@ module.exports.order_post = async (req, res) => {
         if (cartItems.length === 0) {
             return res.redirect('/cart?error=no_items_valid');
         }
+
         const orderId = await Order.create(req.user.id, delivery_address, cartItems);
         await Cart.removeItems(req.user.id, selectedIds);
 
@@ -183,6 +188,7 @@ module.exports.order_post = async (req, res) => {
             message: `Ваш заказ №${orderId} успешно создан и принят в обработку.`,
             link: '/profile'
         });
+
         res.redirect('/profile');
     } catch (err) {
         console.error('Ошибка оформления заказа:', err);
@@ -208,13 +214,15 @@ module.exports.notifications_get = async (req, res) => {
             Notification.findByUser(req.user.id),
             SpecialOffer.findActiveForUser(req.user.id)
         ]);
+
         const formattedOffers = specialOffers.map(offer => ({
             ...offer,
             expires_at_formatted: format(new Date(offer.expires_at), 'dd.MM.yyyy HH:mm'),
             is_expired: isPast(new Date(offer.expires_at))
         }));
-        renderWithApiKey(res, 'pages/notifications', { 
-            title: 'Уведомления', 
+
+        renderWithApiKey(res, 'pages/notifications', {
+            title: 'Уведомления',
             notifications,
             specialOffers: formattedOffers
         });
@@ -245,6 +253,27 @@ module.exports.offer_accept_post = async (req, res) => {
         res.redirect('/cart');
     } catch (err) {
         console.error(err);
+        res.status(500).send("Ошибка сервера");
+    }
+};
+
+module.exports.order_details_get = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const order = await Order.findDetailsById(orderId);
+
+        if (!order || order.user_id !== req.user.id) {
+            return res.status(404).render('pages/404', { title: 'Заказ не найден' });
+        }
+
+        renderWithApiKey(res, 'pages/order_details', {
+            title: `Детали заказа №${order.id}`,
+            order,
+            backUrl: '/profile'
+        });
+
+    } catch (err) {
+        console.error("Ошибка на странице деталей заказа:", err);
         res.status(500).send("Ошибка сервера");
     }
 };

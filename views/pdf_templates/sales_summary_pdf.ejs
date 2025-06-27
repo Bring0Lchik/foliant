@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <style>body{font-family:Arial,sans-serif;font-size:10pt;color:#333}h1,h2,h3{font-family:'Times New Roman',serif;color:#000;margin-bottom:.5em;page-break-after:avoid}h1{font-size:24pt;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:20px;text-align:center}h2{font-size:18pt;margin-top:25px;border-bottom:1px solid #ccc;padding-bottom:5px}table{width:100%;border-collapse:collapse;margin-top:10px;page-break-inside:auto}tr{page-break-inside:avoid;page-break-after:auto}th,td{border:1px solid #ddd;padding:6px;text-align:left;vertical-align:top;font-size:9pt}th{background-color:#f2f2f2;font-weight:700}.summary-metrics{display:flex;flex-wrap:wrap;justify-content:space-around;gap:15px;margin-bottom:20px}.metric-card{border:1px solid #ddd;border-radius:5px;padding:15px;text-align:center;flex:1;min-width:150px}.metric-card h4{font-size:11pt;margin-top:0;color:#555}.metric-card p{font-size:16pt;font-weight:700;margin:5px 0 0}.no-data{text-align:center;padding:20px;font-style:italic;color:#777}</style>
+</head>
+<body>
+    <h1><%= title %></h1>
+    <p style="text-align:center;font-size:9pt">Период: с <%= filters.startDate || 'начала времен' %> по <%= filters.endDate || 'сегодня' %></p>
+    
+    <% if (salesSummaryReport && salesSummaryReport.metrics) { %>
+        <div class="summary-metrics">
+            <div class="metric-card"><h4>Общая выручка</h4><p><%= Number(salesSummaryReport.metrics.totalRevenue||0).toFixed(2) %> ₽</p></div>
+            <div class="metric-card"><h4>Продано книг</h4><p><%= Number(salesSummaryReport.metrics.totalBooksSold||0) %> шт.</p></div>
+            <div class="metric-card"><h4>Кол-во заказов</h4><p><%= Number(salesSummaryReport.metrics.totalOrders||0) %></p></div>
+            <div class="metric-card"><h4>Средний чек</h4><p><%= Number(salesSummaryReport.metrics.averageCheck||0).toFixed(2) %> ₽</p></div>
+        </div>
+        <% if (salesSummaryReport.groupedData.length > 0) { %>
+            <table>
+                <thead><tr><th>Период</th><th>Выручка</th><th>Продано книг</th><th>Кол-во заказов</th><th>Средний чек</th></tr></thead>
+                <tbody>
+                    <% salesSummaryReport.groupedData.forEach(row => { %>
+                        <tr><td><%= row.period %></td><td><%= Number(row.revenue||0).toFixed(2) %> ₽</td><td><%= Number(row.books_sold||0) %></td><td><%= Number(row.order_count||0) %></td><td><%= Number(row.avg_check||0).toFixed(2) %> ₽</td></tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="no-data">Нет данных за выбранный период.</div>
+        <% } %>
+    <% } else { %>
+        <div class="no-data">Нет данных для отчета.</div>
+    <% } %>
+
+    <p style="text-align:right;font-size:8pt;color:#777;margin-top:30px">Дата формирования: <%= new Date().toLocaleString('ru-RU') %></p>
+</body>
+</html>

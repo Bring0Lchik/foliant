@@ -1,0 +1,56 @@
+<style>
+    .summary-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;}
+    .metric-card { background: #fff; padding: 20px; border-radius: var(--border-radius); box-shadow: var(--box-shadow); text-align: center; }
+    .metric-card h4 { margin-bottom: 10px; color: #6c757d; font-size: 1rem; }
+    .metric-card p { font-size: 2rem; font-weight: 700; color: var(--color-black); }
+</style>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>Издательство: <%= details.name %></h1>
+    <a href="/admin/publishers/edit/<%= details.id %>" class="btn btn-warning">Редактировать</a>
+</div>
+
+<div class="summary-metrics">
+    <div class="metric-card">
+        <h4>Всего книг в каталоге</h4>
+        <p><%= details.totalBooks %> шт.</p>
+    </div>
+    <div class="metric-card">
+        <h4>Общий остаток на складе</h4>
+        <p><%= details.totalStock %> шт.</p>
+    </div>
+    <div class="metric-card">
+        <h4>Общая выручка от продаж</h4>
+        <p><%= Number(details.totalRevenue || 0).toFixed(2) %> ₽</p>
+    </div>
+</div>
+
+<h3>Книги издательства</h3>
+<% if (details.books.length > 0) { %>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название книги</th>
+                <th>ISBN</th>
+                <th>Цена</th>
+                <th>Остаток на складе</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% details.books.forEach(book => { %>
+                <tr>
+                    <td><%= book.id %></td>
+                    <td><a href="/admin/books/edit/<%= book.id %>"><%= book.title %></a></td>
+                    <td><%= book.isbn || 'N/A' %></td>
+                    <td><%= Number(book.price).toFixed(2) %> ₽</td>
+                    <td style="<%= book.stock_quantity < 10 ? 'color:red; font-weight:bold;' : '' %>"><%= book.stock_quantity %> шт.</td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>У этого издательства пока нет книг в каталоге.</p>
+<% } %>
+
+<a href="/admin/publishers" style="margin-top: 20px; display: inline-block;">← Назад к списку издательств</a>

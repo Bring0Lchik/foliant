@@ -1,0 +1,63 @@
+<% 
+const statusClassMap = {
+    "В обработке": "processing",
+    "Отправлен": "shipped",
+    "Доставлен": "delivered",
+    "Отменен": "cancelled"
+};
+%>
+
+<div class="container" style="max-width: 900px;">
+    <a href="<%= backUrl %>" class="btn btn-secondary btn-sm" style="margin-bottom: 20px;">← Назад к списку</a>
+
+    <h1>Детали Заказа №<%= order.id %></h1>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+        <!-- Левая колонка: Информация о заказе -->
+        <div>
+            <h3>Информация о заказе</h3>
+            <ul class="book-specs">
+                <li><strong>Статус:</strong> <span class="status-badge status-<%= statusClassMap[order.status] %>"><%= order.status %></span></li>
+                <li><strong>Дата заказа:</strong> <span><%= new Date(order.created_at).toLocaleString('ru-RU') %></span></li>
+                <li><strong>Клиент:</strong> <span><%= order.full_name %></span></li>
+                <li><strong>Email:</strong> <span><%= order.email %></span></li>
+                <li><strong>Адрес доставки:</strong> <span><%= order.delivery_address %></span></li>
+            </ul>
+        </div>
+
+        <!-- Правая колонка: Состав заказа -->
+        <div>
+            <h3>Состав заказа</h3>
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70%;">Товар</th>
+                        <th>Кол-во</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.items.forEach(item => { %>
+                    <tr>
+                        <td>
+                            <div class="cart-item-title">
+                                <img src="<%= item.cover_image_path %>" alt="<%= item.title %>">
+                                <span><a href="/book/<%= item.book_id %>"><%= item.title %></a></span>
+                            </div>
+                            <small style="color: #6c757d;">Цена: <%= Number(item.price_per_item).toFixed(2) %> ₽</small>
+                        </td>
+                        <td style="text-align: center;"><%= item.quantity %></td>
+                        <td style="white-space: nowrap;"><%= (item.quantity * item.price_per_item).toFixed(2) %> ₽</td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+                <tfoot>
+                    <tr style="font-weight: bold; font-size: 1.2rem;">
+                        <td colspan="2" style="text-align: right; padding-top: 15px;">Итого:</td>
+                        <td style="white-space: nowrap; padding-top: 15px;"><%= Number(order.total_amount).toFixed(2) %> ₽</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

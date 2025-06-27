@@ -1,7 +1,8 @@
 <div class="container">
     <h1>Каталог книг</h1>
+
     <div class="catalog-filters">
-        <form class="filter-form" action="/catalog" method="GET">
+        <form class="filter-form" action="/catalog" method="GET" id="filter-form">
             <div class="form-group">
                 <label for="searchTerm">Поиск по названию</label>
                 <input type="text" name="searchTerm" id="searchTerm" class="form-control" value="<%= locals.filters && filters.searchTerm ? filters.searchTerm : '' %>">
@@ -12,9 +13,9 @@
                     <option value="">Все жанры</option>
                     <% if (locals.allCategories) { %>
                         <% allCategories.forEach(cat => { %>
-                            <option value="<%= cat.id %>" <%= (locals.filters && filters.categoryId == cat.id) ? 'selected' : '' %>>
-                                <%= cat.name %>
-                            </option>
+                        <option value="<%= cat.id %>" <%= (locals.filters && filters.categoryId == cat.id) ? 'selected' : '' %>>
+                            <%= cat.name %>
+                        </option>
                         <% }) %>
                     <% } %>
                 </select>
@@ -25,9 +26,9 @@
                     <option value="">Все авторы</option>
                     <% if (locals.authors) { %>
                         <% authors.forEach(author => { %>
-                            <option value="<%= author.id %>" <%= (locals.filters && filters.authorId == author.id) ? 'selected' : '' %>>
-                                <%= author.name %>
-                            </option>
+                        <option value="<%= author.id %>" <%= (locals.filters && filters.authorId == author.id) ? 'selected' : '' %>>
+                            <%= author.name %>
+                        </option>
                         <% }) %>
                     <% } %>
                 </select>
@@ -38,9 +39,9 @@
                     <option value="">Все издательства</option>
                     <% if (locals.publishers) { %>
                         <% publishers.forEach(p => { %>
-                            <option value="<%= p.id %>" <%= (locals.filters && filters.publisherId == p.id) ? 'selected' : '' %>>
-                                <%= p.name %>
-                            </option>
+                        <option value="<%= p.id %>" <%= (locals.filters && filters.publisherId == p.id) ? 'selected' : '' %>>
+                            <%= p.name %>
+                        </option>
                         <% }) %>
                     <% } %>
                 </select>
@@ -62,25 +63,59 @@
                 <input type="text" name="endYear" id="endYear" class="form-control" placeholder="YYYY" pattern="\d{4}" title="Введите 4 цифры года" value="<%= locals.filters && filters.endYear ? filters.endYear : '' %>">
             </div>
             
+            <div class="form-group">
+                <label for="sortBy">Сортировать по</label>
+                <select name="sortBy" id="sortBy" class="form-control" onchange="document.getElementById('filter-form').submit();">
+                    <option value="newest" <%= (locals.filters && filters.sortBy === 'newest') ? 'selected' : '' %>>Сначала новые</option>
+                    <option value="popularity_desc" <%= (locals.filters && filters.sortBy === 'popularity_desc') ? 'selected' : '' %>>По популярности</option>
+                    <option value="rating_desc" <%= (locals.filters && filters.sortBy === 'rating_desc') ? 'selected' : '' %>>По рейтингу</option>
+                    <option value="price_asc" <%= (locals.filters && filters.sortBy === 'price_asc') ? 'selected' : '' %>>Сначала дешевые</option>
+                    <option value="price_desc" <%= (locals.filters && filters.sortBy === 'price_desc') ? 'selected' : '' %>>Сначала дорогие</option>
+                    <option value="title_asc" <%= (locals.filters && filters.sortBy === 'title_asc') ? 'selected' : '' %>>По названию (А-Я)</option>
+                    <option value="oldest" <%= (locals.filters && filters.sortBy === 'oldest') ? 'selected' : '' %>>Сначала старые</option>
+                </select>
+            </div>
+
             <button type="submit" class="btn btn-primary">Применить</button>
             <a href="/catalog" class="btn btn-secondary">Сбросить</a>
         </form>
     </div>
-    
+
     <div class="catalog-grid">
-        <% if (books && books.length > 0) { books.forEach(book => { %>
-            <article class="book-card">
-                <a href="/book/<%= book.id %>" class="book-card__image-link"><img src="<%= book.cover_image_path %>" alt="<%= book.title %>" class="book-card__image"></a>
-                <div class="book-card__content">
-                    <h3 class="book-card__title"><a href="/book/<%= book.id %>"><%= book.title %></a></h3>
-                    <p class="book-card__author"><%= book.authors %></p>
-                    <div class="book-card__footer">
-                        <span class="book-card__price"><%= Number(book.price).toFixed(2) %> ₽</span>
-                        <form action="/cart/add/<%= book.id %>" method="POST"><button class="btn btn-secondary btn-sm">В корзину</button></form>
+        <% if (books && books.length > 0) { %>
+            <% books.forEach(book => { %>
+                <article class="book-card">
+                    <a href="/book/<%= book.id %>" class="book-card__image-link"><img src="<%= book.cover_image_path %>"
+                            alt="<%= book.title %>" class="book-card__image"></a>
+                    <div class="book-card__content">
+                        <h3 class="book-card__title"><a href="/book/<%= book.id %>"><%= book.title %></a></h3>
+                        <p class="book-card__author"><%= book.authors %></p>
+                        
+                        <% if (book.rating > 0) { %>
+                            <div class="book-rating" style="margin-bottom: 10px; color: #f8c100;">
+                                <% for(let i = 1; i <= 5; i++) { %>
+                                    <% if (i <= book.rating) { %>
+                                        <i class="fa-solid fa-star"></i>
+                                    <% } else if (i - 0.5 <= book.rating) { %>
+                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                    <% } else { %>
+                                        <i class="fa-regular fa-star"></i>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        <% } else { %>
+                            <div style="height: 1rem; margin-bottom: 10px;"></div>
+                        <% } %>
+        
+                        <div class="book-card__footer">
+                            <span class="book-card__price"><%= Number(book.price).toFixed(2) %> ₽</span>
+                            <form action="/cart/add/<%= book.id %>" method="POST"><button
+                                    class="btn btn-secondary btn-sm">В корзину</button></form>
+                        </div>
                     </div>
-                </div>
-            </article>
-        <% }) } else { %>
+                </article>
+            <% }) %>
+        <% } else { %>
             <p>По вашему запросу ничего не найдено. Попробуйте изменить фильтры.</p>
         <% } %>
     </div>

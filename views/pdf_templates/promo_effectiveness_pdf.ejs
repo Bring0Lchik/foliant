@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"><title><%= title %></title><style>body{font-family:Arial,sans-serif;font-size:10pt;color:#333}h1,h2,h3{font-family:'Times New Roman',serif;color:#000;margin-bottom:.5em;page-break-after:avoid}h1{font-size:24pt;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:20px;text-align:center}table{width:100%;border-collapse:collapse;margin-top:10px;page-break-inside:auto}tr{page-break-inside:avoid;page-break-after:auto}th,td{border:1px solid #ddd;padding:6px;text-align:left;vertical-align:top;font-size:9pt}th{background-color:#f2f2f2;font-weight:700}.summary-metrics{display:flex;flex-wrap:wrap;justify-content:space-around;gap:15px;margin-bottom:20px}.metric-card{border:1px solid #ddd;border-radius:5px;padding:15px;text-align:center;flex:1;min-width:150px}.metric-card h4{font-size:11pt;margin-top:0;color:#555}.metric-card p{font-size:16pt;font-weight:700;margin:5px 0 0}.no-data{text-align:center;padding:20px;font-style:italic;color:#777}</style>
+</head>
+<body>
+    <h1><%= title %></h1>
+    <p style="text-align:center;font-size:9pt">Период: с <%= filters.startDate || 'начала времен' %> по <%= filters.endDate || 'сегодня' %></p>
+
+    <% if (promoEffectivenessReport && promoEffectivenessReport.metrics) { %>
+        <div class="summary-metrics">
+            <div class="metric-card"><h4>Создано</h4><p><%= Number(promoEffectivenessReport.metrics.totalCreated||0) %></p></div>
+            <div class="metric-card"><h4>Принято</h4><p><%= Number(promoEffectivenessReport.metrics.totalAccepted||0) %></p></div>
+            <div class="metric-card"><h4>Конверсия</h4><p><%= Number(promoEffectivenessReport.metrics.conversion||0).toFixed(2) %> %</p></div>
+            <div class="metric-card"><h4>Доп. выручка</h4><p><%= Number(promoEffectivenessReport.metrics.additionalRevenue||0).toFixed(2) %> ₽</p></div>
+        </div>
+        <% if (promoEffectivenessReport.details.length > 0) { %>
+            <table>
+                <thead><tr><th>Книга</th><th>Клиент</th><th>Цена (до/после)</th><th>Статус</th><th>Дата создания</th></tr></thead>
+                <tbody>
+                    <% promoEffectivenessReport.details.forEach(promo => { %>
+                        <tr><td><%= promo.book_title %></td><td><%= promo.client_name %></td><td><%= Number(promo.original_price||0).toFixed(2) %> / <%= Number(promo.offer_price||0).toFixed(2) %> ₽</td><td><%= promo.status %></td><td><%= new Date(promo.created_at).toLocaleString('ru-RU') %></td></tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="no-data">Нет данных за выбранный период.</div>
+        <% } %>
+    <% } else { %>
+        <div class="no-data">Нет данных за выбранный период.</div>
+    <% } %>
+
+    <p style="text-align:right;font-size:8pt;color:#777;margin-top:30px">Дата формирования: <%= new Date().toLocaleString('ru-RU') %></p>
+</body>
+</html>
