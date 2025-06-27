@@ -1,45 +1,59 @@
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggleButton = document.getElementById('theme-toggle-button');
-    const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
-    const sunIcon = 'fa-sun';
-    const moonIcon = 'fa-moon';
+    // Используем Font Awesome классы для иконок
+    const sunIconClass = 'fa-sun';
+    const moonIconClass = 'fa-moon';
 
-    if (currentTheme) {
-        document.body.setAttribute('data-theme', currentTheme);
+    // Функция для применения темы и обновления иконки
+    function applyTheme(theme) {
+        document.body.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
         if (themeToggleButton) {
             const icon = themeToggleButton.querySelector('i');
-            if (currentTheme === 'dark') {
-                icon.classList.remove(sunIcon);
-                icon.classList.add(moonIcon);
+            if (theme === 'dark') {
+                icon.classList.remove(sunIconClass);
+                icon.classList.add(moonIconClass);
+                themeToggleButton.setAttribute('title', 'Переключить на светлую тему');
             } else {
-                icon.classList.remove(moonIcon);
-                icon.classList.add(sunIcon);
+                icon.classList.remove(moonIconClass);
+                icon.classList.add(sunIconClass);
+                themeToggleButton.setAttribute('title', 'Переключить на темную тему');
             }
-        }
-    } else { // Default to light theme if no preference is stored
-        document.body.setAttribute('data-theme', 'light');
-         if (themeToggleButton) {
-            const icon = themeToggleButton.querySelector('i');
-            icon.classList.remove(moonIcon);
-            icon.classList.add(sunIcon);
         }
     }
 
+    // Получаем сохраненную тему или системные предпочтения
+    let currentTheme = localStorage.getItem('theme');
+    if (!currentTheme) {
+        // Если нет сохраненной темы, проверяем системные предпочтения
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            currentTheme = 'dark';
+        } else {
+            currentTheme = 'light'; // По умолчанию светлая тема
+        }
+    }
+
+    // Применяем тему при загрузке страницы
+    applyTheme(currentTheme);
+
+    // Обработчик клика по кнопке
     if (themeToggleButton) {
         themeToggleButton.addEventListener('click', () => {
             let theme = document.body.getAttribute('data-theme');
-            const icon = themeToggleButton.querySelector('i');
-
             if (theme === 'dark') {
-                document.body.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-                icon.classList.remove(moonIcon);
-                icon.classList.add(sunIcon);
+                applyTheme('light');
             } else {
-                document.body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-                icon.classList.remove(sunIcon);
-                icon.classList.add(moonIcon);
+                applyTheme('dark');
+            }
+        });
+    }
+
+    // Слушаем изменения системных предпочтений (опционально, для автоматического переключения)
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            // Переключаем тему только если пользователь не выбрал ее вручную (нет записи в localStorage)
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches ? 'dark' : 'light');
             }
         });
     }
