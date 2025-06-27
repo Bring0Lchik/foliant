@@ -23,6 +23,217 @@
     --transition-speed: 0.3s;
 }
 
+/* Dark mode styles - activated by .dark-mode class on body */
+.dark-mode {
+    --color-black: #121212;
+    --color-white: #ffffff;
+        --color-gray-light: #1e1e1e;
+        --color-gray-medium: #2a2a2a;
+        --color-gray-dark: #3a3a3a;
+        --color-text: #e0e0e0;
+        --color-accent: #00DAC5;
+        --color-accent-dark: #00B3A0;
+        --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+        background-color: var(--color-black);
+        color: var(--color-text);
+    }
+
+    .site-header {
+        background-color: var(--color-gray-light);
+        border-bottom: 1px solid var(--color-gray-medium);
+    }
+
+    .logo {
+        color: var(--color-white);
+    }
+
+    .logo:hover {
+        color: var(--color-white);
+    }
+
+    .main-nav a {
+        color: var(--color-text);
+    }
+
+    .main-nav a::after {
+        background-color: var(--color-accent);
+    }
+
+    .form-container {
+        background: var(--color-gray-light);
+    }
+
+    .form-control {
+        background-color: var(--color-gray-medium);
+        border: 1px solid var(--color-gray-dark);
+        color: var(--color-text);
+    }
+
+    .form-control:focus {
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 3px rgba(0, 218, 197, 0.2); /* Adjusted accent color for focus */
+    }
+
+    h1, h2, h3, h4 {
+        color: var(--color-white);
+    }
+
+    .book-card {
+        background-color: var(--color-gray-light);
+    }
+
+    .book-card__title a {
+        color: var(--color-text);
+    }
+
+    .book-card__author {
+        color: var(--color-gray-dark);
+    }
+
+    .book-card__price {
+        color: var(--color-white);
+    }
+
+    .site-footer {
+        background-color: #0d0d0d; /* Slightly darker than main background */
+        color: #7a7a7a; /* Adjusted for dark theme */
+    }
+
+    .admin-sidebar {
+        background-color: #1e1e1e; /* Darker sidebar for admin */
+        color: var(--color-white);
+    }
+
+    .admin-nav a {
+        color: #b0b0b0; /* Lighter gray for admin nav links */
+    }
+
+    .admin-nav a:hover,
+    .admin-nav a.active {
+        background-color: var(--color-accent);
+        color: var(--color-black); /* Text on accent for admin nav */
+    }
+
+    .admin-content {
+        background-color: var(--color-black);
+    }
+
+    .admin-table {
+        background-color: var(--color-gray-light);
+    }
+
+    .admin-table th,
+    .admin-table td {
+        border-bottom: 1px solid var(--color-gray-medium);
+    }
+
+    .admin-table th {
+        background-color: #222222; /* Darker header for admin table */
+    }
+
+    .pagination a,
+    .pagination span {
+        background-color: var(--color-gray-light);
+        border: 1px solid var(--color-gray-medium);
+        color: var(--color-text);
+    }
+
+    .pagination a:hover {
+        background-color: #2a2a2a; /* Slightly darker hover for pagination */
+    }
+
+    .pagination .active {
+        background-color: var(--color-accent);
+        color: var(--color-black); /* Text on accent for pagination */
+        border-color: var(--color-accent);
+    }
+
+    .pagination .disabled {
+        color: #5a5a5a; /* Darker disabled color */
+        background-color: #1a1a1a;
+    }
+
+    .catalog-filters {
+        background-color: var(--color-gray-light);
+    }
+
+    .book-specs {
+        background-color: var(--color-gray-light);
+    }
+
+    .book-specs li {
+        border-bottom: 1px solid var(--color-gray-medium);
+    }
+
+    .book-specs strong {
+        color: var(--color-white);
+    }
+
+    .cart-table th {
+        background-color: #222222; /* Darker header for cart table */
+    }
+
+    .cart-table th,
+    .cart-table td {
+        border-bottom: 1px solid var(--color-gray-medium);
+    }
+
+    .modal-content {
+        background-color: var(--color-gray-light);
+    }
+
+    .close-modal {
+        color: #888;
+    }
+
+    .close-modal:hover,
+    .close-modal:focus {
+        color: var(--color-white);
+    }
+
+    .chart-container {
+        background: var(--color-gray-light);
+    }
+
+    .notification-list-item.is-read {
+        opacity: 0.5; /* Adjusted opacity for read notifications */
+    }
+
+    .notification-icon.system {
+        color: #888;
+    }
+
+    .special-offer-card {
+        background-color: var(--color-gray-light);
+        border-left: 5px solid var(--color-warning); /* Warning color remains the same for now */
+    }
+}
+
+/* Styles for the theme toggle button */
+#theme-toggle {
+    background: none;
+    border: 1px solid var(--color-gray-dark);
+    color: var(--color-text);
+    padding: 8px 12px; /* Adjusted padding */
+}
+
+#theme-toggle:hover {
+    background-color: var(--color-gray-medium);
+}
+
+.dark-mode #theme-toggle {
+    border: 1px solid var(--color-gray-medium);
+    color: var(--color-text);
+}
+
+.dark-mode #theme-toggle:hover {
+    background-color: var(--color-gray-dark);
+}
+
+
 *,
 *::before,
 *::after {
